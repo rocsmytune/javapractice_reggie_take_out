@@ -62,4 +62,17 @@ public class EmployeeController {
         request.getSession().setAttribute("employee", emp.getId());
         return R.success(emp);
     }
+
+    /***
+     *
+     * employee logout
+     * @param request
+     * @return
+     */
+    @PostMapping("/logout")
+    public R<String> logout(HttpServletRequest request) {
+        // clean out localStorage content
+        request.getSession().removeAttribute("employee");
+        return R.success("Logout Success");
+    }
 }
