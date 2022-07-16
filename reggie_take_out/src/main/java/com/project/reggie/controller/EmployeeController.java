@@ -1,17 +1,17 @@
 package com.project.reggie.controller;
 
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.project.reggie.common.R;
 import com.project.reggie.entity.Employee;
 import com.project.reggie.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
@@ -102,4 +102,48 @@ public class EmployeeController {
 
         return R.success("Adding New Employee Success!");
     }
+
+    /***
+     * employee paging query based on MybatisPlus
+     * @param page
+     * @param pageSize
+     * @param name
+     * @return
+     */
+    @GetMapping("/page")
+    public R<Page> page(int page, int pageSize, String name) {
+        log.info("page = {}, pageSize = {}, name = {}", page, pageSize, name);
+
+        //construct paging struct
+        Page pageInfo = new Page(page, pageSize);
+
+        //construct condition struct
+        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper();
+        //add filter condition
+        queryWrapper.like(StringUtils.hasText(name), Employee::getName, name);//更模糊的查询
+        //add order condition
+        queryWrapper.orderByDesc(Employee::getUpdateTime);
+
+        //run query
+        employeeService.page(pageInfo, queryWrapper);
+        return R.success(pageInfo);
+    }
+
+    /***
+     * edit employee info acccording to id
+     * @param employee
+     * @return
+     */
+    @PutMapping
+    public  R<String> update(HttpServletRequest request, @RequestBody Employee employee) {
+        log.info(employee.toString());
+
+        Long empId = (Long)request.getSession().getAttribute("employee");
+
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(empId);
+        employeeService.updateById(employee);
+        return R.success("Update Employee Info Success!");
+    }
+
 }
