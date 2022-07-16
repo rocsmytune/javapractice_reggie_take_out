@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 
 @Slf4j
 @RestController
@@ -74,5 +75,31 @@ public class EmployeeController {
         // clean out localStorage content
         request.getSession().removeAttribute("employee");
         return R.success("Logout Success");
+    }
+
+
+    /***
+     * add new employee
+     * @param employee
+     * @return
+     */
+
+    @PostMapping
+    public R<String> save(@RequestBody Employee employee, HttpServletRequest request) {
+        log.info("Add new employees, info: {}", employee.toString());
+
+        //set passward md5 123456
+        employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
+
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
+
+        Long empId = (Long)request.getSession().getAttribute("employee");
+        employee.setCreateUser(empId);
+        employee.setUpdateUser(empId);
+
+        employeeService.save(employee);
+
+        return R.success("Adding New Employee Success!");
     }
 }
