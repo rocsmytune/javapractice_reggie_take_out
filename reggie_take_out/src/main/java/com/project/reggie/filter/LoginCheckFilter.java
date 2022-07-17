@@ -1,6 +1,7 @@
 package com.project.reggie.filter;
 
 import com.alibaba.fastjson.JSON;
+import com.project.reggie.common.BaseContext;
 import com.project.reggie.common.R;
 import com.sun.tools.javac.comp.Check;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +50,10 @@ public class LoginCheckFilter implements Filter {
         //judge login status, if login success, then leave out
         if (request.getSession().getAttribute("employee") != null) {
             log.info("User Login, ID: {} ", request.getSession().getAttribute("employee"));
+
+            Long empId = (Long)request.getSession().getAttribute("employee");
+            BaseContext.setCurrentId(empId);
+
             filterChain.doFilter(request, response);
             return;
         }
