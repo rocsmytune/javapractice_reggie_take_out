@@ -7,11 +7,13 @@ import com.project.reggie.entity.Category;
 import com.project.reggie.entity.Employee;
 import com.project.reggie.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 
 /**
@@ -83,5 +85,21 @@ public class CategoryController {
         categoryService.updateById(category);
         
         return R.success("Update Category Info Success!");
+    }
+
+    /***
+     * query data by conditon
+     * @param category
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Category>> list(Category category) {
+        LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(category.getType() != null, Category::getType, category.getType());
+
+        queryWrapper.orderByAsc(Category::getSort).orderByDesc((Category::getUpdateTime));
+
+        List<Category> list = categoryService.list(queryWrapper);
+        return R.success(list);
     }
 }
