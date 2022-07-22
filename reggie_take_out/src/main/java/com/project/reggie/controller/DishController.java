@@ -96,6 +96,30 @@ public class DishController {
 
     }
 
-    
+    /**
+     * get dish info by id
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public R<DishDto> get(@PathVariable Long id) {
+        DishDto dishDto = dishService.getByIdWithFlavor(id);
+        return R.success(dishDto);
+    }
+
+    /**
+     * edit dish info
+     * @param dishDto
+     * @return
+     */
+    @PutMapping
+    public R<String> update(@RequestBody DishDto dishDto) {
+        log.info(dishDto.toString());
+
+        dishService.updateWithFlavor(dishDto);
+
+        return R.success("Edit dish success!");
+    }
+
 
 }
