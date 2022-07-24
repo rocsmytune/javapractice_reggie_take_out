@@ -35,7 +35,9 @@ public class LoginCheckFilter implements Filter {
                 "/employee/logout",
                 "/backend/**",
                 "/front/**",
-                "/common/**"
+                "/common/**",
+                "/user/sendMsg",
+                "/user/login"
         };
 
         // judge if this request need to be handled
@@ -54,6 +56,17 @@ public class LoginCheckFilter implements Filter {
 
             Long empId = (Long)request.getSession().getAttribute("employee");
             BaseContext.setCurrentId(empId);
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        //judge USER login status, if login success, then leave out
+        if (request.getSession().getAttribute("user") != null) {
+            log.info("User Login, ID: {} ", request.getSession().getAttribute("user"));
+
+            Long userId = (Long)request.getSession().getAttribute("user");
+            BaseContext.setCurrentId(userId);
 
             filterChain.doFilter(request, response);
             return;
