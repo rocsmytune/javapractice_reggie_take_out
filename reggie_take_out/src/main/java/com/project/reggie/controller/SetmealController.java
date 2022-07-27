@@ -100,4 +100,23 @@ public class SetmealController {
         setmealService.removeWithDish(ids);
         return R.success("Delete setmeal success!");
     }
+
+    /**
+     * query setmeal data according to conditions
+     * @param setmeal
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Setmeal>> list(Setmeal setmeal) {
+        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(setmeal.getCategoryId() != null, Setmeal::getCategoryId, setmeal.getCategoryId());
+        queryWrapper.eq(setmeal.getStatus() != null, Setmeal::getStatus, setmeal.getStatus());
+
+        queryWrapper.orderByDesc((Setmeal::getUpdateTime));
+
+        List<Setmeal> list = setmealService.list(queryWrapper);
+
+        return R.success(list);
+
+    }
 }
